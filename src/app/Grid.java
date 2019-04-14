@@ -9,6 +9,13 @@ import java.util.ArrayList;
 class Grid {
     ArrayList<ArrayList<Byte>> map;
 
+    static final byte BLACK  = 0;
+    static final byte WHITE  = 1;
+    static final int  TOP    = 0;
+    static final int  BOTTOM = 1;
+    static final int  LEFT   = 2;
+    static final int  RIGHT  = 3;
+
     /*
      * Constructor that accepts a preallocated mapping of coordinates
      */ 
@@ -73,29 +80,46 @@ class Grid {
         return this.map.get(0).size();
     }
     
-        /*
+    /*
+     * Adds a 0 filled column to either the 'left' or 'right' of the grid, maintaining 0,0 as the origin
+     * If inserted left, the new col becomes y=0, and all existing cols shift right by 1
+     * Returns the new Width of the grid.
+     */
+    public int AddCol(int where) {
+        for(int y=0; y<this.Height(); y++) {
+            switch (where) {
+            case LEFT: 
+                this.map.get(y).add(0, BLACK);
+                break;
+            case RIGHT:
+                this.map.get(y).add(BLACK);
+                break;
+            }
+        }
+        return this.Width();
+    }
+
+    /*
      * Adds a 0 filled row to either the 'top' or 'bottom' of the grid, maintaining 0,0 as the origin
      * If inserted below, the new row becomes x=0, and all existing rows shift up by 1
      * Returns the new Height of the grid.
-     * TODO: add constants for the top/bottom selection
      */
     public int AddRow(int where) {
-     //        var newRow = CreateRow(this.Width());
         var newRow = new ArrayList<Byte>(this.Width()+1);
-        for(int x=0; x>this.Width();x++) {
-            newRow.add((byte)0);
+        for(int x=0; x<this.Width(); x++) {
+            newRow.add(BLACK);
         }
-       switch (where) {
-        case 1: // 1 = top
+        switch (where) {
+        case TOP: 
             this.map.add(this.Height(), newRow);
             break;
-        case 0: // 0 = bottom
+        case BOTTOM:
             this.map.add(0, newRow);
             break;
         }
         return this.Height();
     }
-
+   
     /*
      * Helper function to generate a right sized horizontal dashed line
      */
@@ -114,9 +138,9 @@ class Grid {
      */ 
     protected static char ByteToColor(byte b) {
         switch (b % 2) {
-        case 0:
+        case BLACK:
             return 'B';
-        case 1:
+        case WHITE:
             return 'W';
         default:
             // dumb compiler
@@ -127,15 +151,24 @@ class Grid {
     public static void main(String[] args) {
         byte[][] b = { { 00, 10, 20, 30 }, { 01, 11, 21, 31 }, { 02, 12, 22, 32 } };
         var g = new Grid(b);
-        System.out.printf("Map:\n%s", g.Draw());
-        System.out.printf("Adding a row to top to make %d rows\n", g.AddRow(1));
+        System.out.printf("Iniital Map:\n%s", g.Draw());
+
+        System.out.printf("Adding a row to top to make %d rows\n", g.AddRow(TOP));
+        System.out.printf("Map:\n%s", g.Draw());        
+        System.out.printf("Adding a row to bottom to make %d rows\n", g.AddRow(BOTTOM));
+        System.out.printf("Change 0,0 to make it cooler looking...\n");
+        g.Set(0, 0, WHITE);
+        System.out.printf("Map:\n%s", g.Draw());        
+        System.out.printf("Adding a col to the left to make %d cols\n", g.AddCol(LEFT));
+        System.out.printf("Map:\n%s", g.Draw());        
+        System.out.printf("Adding a col to the right to make %d cols\n", g.AddCol(RIGHT));
         System.out.printf("Map:\n%s", g.Draw());        
 
         System.out.printf("H=%d, W=%d\n", g.Height(), g.Width());
         System.out.printf("Get(0,0)=%d\n", g.Get(0, 0));
-        System.out.printf("Get(1,1)=%d\n", g.Get(1,1));
+        System.out.printf("Get(1,1)=%d\n", g.Get(1, 1));
         System.out.printf("Before: Get(2,1)=%d\n", g.Get(2, 1));
-        g.Set(2, 1, (byte)0);
+        g.Set(2, 1, BLACK);
         System.out.printf("After: Get(2,1)=%d\n", g.Get(2, 1));
     }
 
