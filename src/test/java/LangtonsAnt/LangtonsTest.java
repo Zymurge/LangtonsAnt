@@ -13,4 +13,6 @@ public class LangtonsTest {
         var l = new Langtons();
         assertTrue(l != null);
     }
+	
+	
 }

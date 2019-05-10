@@ -14,4 +14,8 @@ class Ant {
     	this.Heading = d;
     }
     
+    public String ToString() {
+    	return String.format("(%d,%d) %s", this.X, this.Y, this.Heading);
+    }
+    
 }

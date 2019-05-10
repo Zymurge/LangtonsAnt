@@ -40,8 +40,9 @@ public class Grid {
     
     /*
      * Generates a string representation of the grid with one row per line.
+     * Takes an Ant as input to generate a marking for it's location and heading.
      */
-    public String Draw() {
+    public String Draw(Ant loc) {
         var out = new StringBuilder();
         out.append(DrawHorizontalLine(this.Width()));
         
@@ -49,14 +50,22 @@ public class Grid {
         for (int r=this.Height()-1; r >= 0; r--) {
             var row = this.map.get(r);
             out.append("| ");
-            for (byte b : row) {
-                out.append(ByteToColor(b));
+            for (int x=0; x<row.size(); x++) {
+            	byte b = row.get(x);
+            	var adjX = x+minX;
+            	var adjY = r+minY;
+            	if(adjY == loc.Y && adjX == loc.X) {
+            		out.append(HeadingAsChar(loc.Heading));
+            	} else {
+            		out.append(ByteToColor(b));
+            	}
                 out.append(' ');
             }
             out.append("|\n");
         }
     
         out.append(DrawHorizontalLine(this.Width()));
+        out.append("Ant at " + loc.ToString() + "\n");
         return out.toString();
     }
     
@@ -200,6 +209,26 @@ public class Grid {
             return 'B';
         case WHITE:
             return 'W';
+        default:
+            // dumb compiler
+            return 0;
+        }
+    }
+
+    /*
+     * Map byte values to either black (even) or white (odd)
+     * Returns B for black, W for white
+     */ 
+    protected static char HeadingAsChar(Grid.Heading h) {
+        switch (h) {
+        case NORTH:
+            return '^';
+        case EAST:
+            return '>';
+        case SOUTH:
+            return 'v';
+        case WEST:
+            return '<';
         default:
             // dumb compiler
             return 0;
