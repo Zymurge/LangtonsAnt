@@ -1,8 +1,11 @@
-# Compiled class file
-*.class
+# Ignore Gradle project-specific cache directory
+/.gradle
 
-# Log file
-*.log
+# Ignore Gradle build output directory
+/build
+
+# Ignore Java built stuff
+/bin
 
 # Package Files #
 *.jar
@@ -12,7 +15,3 @@
 *.zip
 *.tar.gz
 *.rar
-
-/bin
-/build
-/.gradle

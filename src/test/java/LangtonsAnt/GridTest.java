@@ -41,8 +41,9 @@ public class GridTest {
 
 		@Test
 		void testDrawReallyBasic() {
-			var result = target.Draw();
-			assertEquals(result," -------\n| W W W |\n| W B B |\n| B B W |\n| B W B |\n -------\n");
+	        var a = new Ant(1, 2, Grid.Heading.SOUTH);
+			var result = target.Draw(a);
+			assertEquals(result," -------\n| W W W |\n| W v B |\n| B B W |\n| B W B |\n -------\nAnt at (1,2) SOUTH\n");
 		}
 		
     }
