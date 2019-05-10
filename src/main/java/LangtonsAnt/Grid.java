@@ -1,0 +1,211 @@
+package LangtonsAnt;
+
+import java.util.ArrayList;
+
+/*
+ * Represents the two dimensional map and status of the coordinates
+ * Uses a standard X,Y coord system, with 0,0 in the lower left.
+ */ 
+public class Grid {
+    ArrayList<ArrayList<Byte>> map;
+
+    static final byte BLACK  = 0;
+    static final byte WHITE  = 1;
+    
+    public enum Heading {
+	    // ordering is important. Must be clockwise for turn calculations
+    	NORTH, EAST, SOUTH, WEST;
+    }
+    
+    public enum Direction {
+    	LEFT, RIGHT;
+    }
+
+    /*
+     * Constructor that accepts a preallocated mapping of coordinates
+     */ 
+    public Grid(byte[][] m) {
+        map = new ArrayList<ArrayList<Byte>>(m.length);
+        for (byte[] byteRow : m) {
+            var alRow = new ArrayList<Byte>(byteRow.length);
+            for (Byte b : byteRow) {
+                alRow.add(b);
+            }
+            map.add(alRow);
+        }
+    }
+    
+    /*
+     * Generates a string representation of the grid with one row per line.
+     */
+    public String Draw() {
+        var out = new StringBuilder();
+        out.append(DrawHorizontalLine(this.Width()));
+        
+        // Walk the rows in reverse order, since we want row 0 on bottom and increasing up the Y axis
+        for (int r=this.Height()-1; r >= 0; r--) {
+            var row = this.map.get(r);
+            out.append("| ");
+            for (byte b : row) {
+                out.append(ByteToColor(b));
+                out.append(' ');
+            }
+            out.append("|\n");
+        }
+    
+        out.append(DrawHorizontalLine(this.Width()));
+        return out.toString();
+    }
+    
+    /*
+     * Returns the value at the specified coordinate
+     */ 
+    public byte Get(int x, int y) {
+        return this.map.get(y).get(x);
+    }
+    
+    /*
+     * Sets the value at the specified coordinate
+     */
+    public void Set(int x, int y, byte value) {
+        this.map.get(y).set(x, value);
+    }
+    
+    /*
+     * Returns the number of rows in the grid
+     */
+    public int Height() {
+        return this.map.size();
+    }
+    
+    /*
+     * Returns the number of columns in the grid
+     */
+    public int Width() {
+        return this.map.get(0).size();
+    }
+    
+    /*
+     * Adds a 0 filled column to either the 'west' or 'east' of the grid, maintaining 0,0 as the origin
+     * If inserted left, the new col becomes y=0, and all existing cols shift right by 1
+     * Returns the new Width of the grid.
+     */
+    public int AddCol(Heading where) {
+        for(int y=0; y<this.Height(); y++) {
+            switch (where) {
+            case WEST: 
+                this.map.get(y).add(0, BLACK);
+                break;
+            case EAST:
+                this.map.get(y).add(BLACK);
+                break;
+            }
+        }
+        return this.Width();
+    }
+
+    /*
+     * Adds a 0 filled row to either the 'north' or 'south' of the grid, maintaining 0,0 as the origin
+     * If inserted below, the new row becomes x=0, and all existing rows shift up by 1
+     * Returns the new Height of the grid.
+     */
+    public int AddRow(Heading where) {
+        var newRow = new ArrayList<Byte>(this.Width()+1);
+        for(int x=0; x<this.Width(); x++) {
+            newRow.add(BLACK);
+        }
+        switch (where) {
+        case NORTH: 
+            this.map.add(this.Height(), newRow);
+            break;
+        case SOUTH:
+            this.map.add(0, newRow);
+            break;
+        }
+        return this.Height();
+    }
+    
+    /*
+     * Moves an ant object in the direction it is currently pointed, by returning a new
+     * Ant instance with the post-move coordinates, while maintaining the same direction.
+     * Will expand the Grid as needed when the move results in a point outside the boundaries.
+     */
+    public Ant MoveAnt(Ant a) {
+    	var n = new Ant(a.X, a.Y, a.Heading);
+    	switch(a.Heading) {
+    	case NORTH:
+    		n.Y = a.Y + 1;
+    		if(n.Y == this.Height()) {
+    			this.AddRow(Heading.NORTH);
+    		}
+    		break;
+    	case SOUTH:
+    		if(a.Y == 0) {
+    			this.AddRow(Heading.SOUTH);
+    			// need to adjust current for inserted row
+    			a.Y++;
+    		}
+    		n.Y = a.Y - 1;
+    		break;
+    	case EAST:
+    		n.X = a.X + 1;
+    		if(n.X == this.Width()) {
+    			this.AddCol(Heading.EAST);
+    		}
+    		break;
+    	case WEST:
+    		if(a.X == 0) {
+    			this.AddCol(Heading.WEST);
+    			// need to adjust current for inserted row
+    			a.X++;
+    		}
+    		n.X = a.X - 1;
+    		break;
+    	}
+    	// Turn the Ant based on the current grid color and rules
+    	n.Heading = this.Get(n.X, n.Y) == 0 ?
+    			Turn(n.Heading, Direction.LEFT) : 
+    			Turn(n.Heading, Direction.RIGHT);
+    	// Update the grid per rules
+    	this.Set(n.X, n.Y, this.Get(n.X, n.Y) == 0 ? (byte)1 : (byte)0);
+    	return n;
+    }
+   
+    /*
+     * Helper function to generate a right sized horizontal dashed line
+     */
+    protected static String DrawHorizontalLine(int numElements) {
+        var out = new StringBuilder(" -");
+        for (var x = 0; x < numElements; x++) {
+            out.append("--");
+        }
+        out.append("\n");
+        return out.toString();
+    }
+    
+    /*
+     * Map byte values to either black (even) or white (odd)
+     * Returns B for black, W for white
+     */ 
+    protected static char ByteToColor(byte b) {
+        switch (b % 2) {
+        case BLACK:
+            return 'B';
+        case WHITE:
+            return 'W';
+        default:
+            // dumb compiler
+            return 0;
+        }
+    }
+
+    /*
+     * Calculates the result of a 90 degree turn from a specified heading.
+     */
+    protected static Heading Turn(Heading h, Direction d) {
+    	var delta = (d == Direction.RIGHT) ? 1 : 3;
+    	var change = (h.ordinal()+delta)%4;
+    	return Heading.values()[change];
+    }
+    
+}
