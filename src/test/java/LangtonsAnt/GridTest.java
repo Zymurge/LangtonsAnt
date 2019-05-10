@@ -66,9 +66,9 @@ public class GridTest {
 		void testAddColLeft() {
 			var newWidth = result.AddCol(Grid.Heading.WEST);
 			assertEquals(oldWidth+1, newWidth, "Expected width to expand by 1");
-			// validate the first entry of each row is the default new value (0)
-			for(int x=0; x < result.Height(); x++) {
-				assertEquals(0, result.Get(0, x), "Each row should have 0 as the first value");
+			// validate the first entry of each row, now x=-1 is the default new value (0)
+			for(int y=0; y < result.Height(); y++) {
+				assertEquals(Grid.BLACK, result.Get(-1, y), "Each row should have 0 as the first value");
 			}
 		}
 		
@@ -77,8 +77,8 @@ public class GridTest {
 			var newWidth = result.AddCol(Grid.Heading.EAST);
 			assertEquals(oldWidth+1, newWidth, "Expected width to expand by 1");
 			// validate the first entry of each row is the default new value (0)
-			for(int x=0; x < result.Height(); x++) {
-				assertEquals(0, result.Get(newWidth-1, x), "Each row should have 0 as the first value");
+			for(int y=0; y < result.Height(); y++) {
+				assertEquals(Grid.BLACK, result.Get(newWidth-1, y), "Each row should have 0 as the first value");
 			}
 		}
 		
@@ -88,7 +88,7 @@ public class GridTest {
 			assertEquals(oldHeight+1, newHeight, "Expected height to expand by 1");
 			// validate all entries of the added row is the default new value (0)
 			for(int x=0; x < result.Width(); x++) {
-				assertEquals(0, result.Get(x, newHeight-1), "Each col in the row should have 0 as the value");
+				assertEquals(Grid.BLACK, result.Get(x, newHeight-1), "Each col in the row should have 0 as the value");
 			}
 		}
 		
@@ -96,9 +96,9 @@ public class GridTest {
 		void testAddRowBottom() {
 			var newHeight = result.AddRow(Grid.Heading.SOUTH);
 			assertEquals(oldHeight+1, newHeight, "Expected height to expand by 1");
-			// validate all entries of the added row is the default new value (0)
+			// validate all entries of the added row, now y=-1, is the default new value (0)
 			for(int x=0; x < result.Width(); x++) {
-				assertEquals(0, result.Get(x, 0), "Each col in the row should have 0 as the value");
+				assertEquals(Grid.BLACK, result.Get(x, -1), "Each col in the row should have 0 as the value");
 			}
 		}
 	}

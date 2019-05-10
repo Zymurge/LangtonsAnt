@@ -8,6 +8,9 @@ import java.util.ArrayList;
  */ 
 public class Grid {
     ArrayList<ArrayList<Byte>> map;
+   // Need to track the far left and bottom indices for coordinates that can go < 0 
+    int minX = 0;
+    int minY = 0;
 
     static final byte BLACK  = 0;
     static final byte WHITE  = 1;
@@ -61,14 +64,14 @@ public class Grid {
      * Returns the value at the specified coordinate
      */ 
     public byte Get(int x, int y) {
-        return this.map.get(y).get(x);
+        return this.map.get(y-minY).get(x-minX);
     }
     
     /*
      * Sets the value at the specified coordinate
      */
     public void Set(int x, int y, byte value) {
-        this.map.get(y).set(x, value);
+        this.map.get(y-minY).set(x-minX, value);
     }
     
     /*
@@ -91,15 +94,21 @@ public class Grid {
      * Returns the new Width of the grid.
      */
     public int AddCol(Heading where) {
-        for(int y=0; y<this.Height(); y++) {
-            switch (where) {
-            case WEST: 
-                this.map.get(y).add(0, BLACK);
-                break;
-            case EAST:
-                this.map.get(y).add(BLACK);
-                break;
+        switch (where) {
+        case WEST: 
+            // insert a new first entry for each row
+        	for(int y=0; y<this.Height(); y++) {
+            	this.map.get(y).add(0, BLACK);
             }
+            // decrement offset for values < 0
+            minX--;
+            break;
+        case EAST:
+            // insert a new last entry for each row
+            for(int y=0; y<this.Height(); y++) {
+            	this.map.get(y).add(BLACK);
+            }
+            break;
         }
         return this.Width();
     }
@@ -120,6 +129,8 @@ public class Grid {
             break;
         case SOUTH:
             this.map.add(0, newRow);
+            // decrement offset for values < 0
+            minY--;
             break;
         }
         return this.Height();
@@ -135,30 +146,26 @@ public class Grid {
     	switch(a.Heading) {
     	case NORTH:
     		n.Y = a.Y + 1;
-    		if(n.Y == this.Height()) {
+    		if(n.Y == this.Height()+minY) {
     			this.AddRow(Heading.NORTH);
     		}
     		break;
     	case SOUTH:
-    		if(a.Y == 0) {
+    		if(a.Y == minY) {
     			this.AddRow(Heading.SOUTH);
-    			// need to adjust current for inserted row
-    			a.Y++;
     		}
     		n.Y = a.Y - 1;
     		break;
     	case EAST:
     		n.X = a.X + 1;
-    		if(n.X == this.Width()) {
+    		if(n.X == this.Width()+minX) {
     			this.AddCol(Heading.EAST);
     		}
     		break;
     	case WEST:
-    		if(a.X == 0) {
+    		if(a.X == minX) {
     			this.AddCol(Heading.WEST);
-    			// need to adjust current for inserted row
-    			a.X++;
-    		}
+     		}
     		n.X = a.X - 1;
     		break;
     	}
