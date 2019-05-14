@@ -7,13 +7,14 @@ import java.util.ArrayList;
  * Uses a standard X,Y coord system, with 0,0 in the lower left.
  */ 
 public class Grid {
-    ArrayList<ArrayList<Byte>> map;
+    ArrayList<ArrayList<ColorMap>> map;
    // Need to track the far left and bottom indices for coordinates that can go < 0 
     int minX = 0;
     int minY = 0;
 
-    static final byte BLACK  = 0;
-    static final byte WHITE  = 1;
+    public enum ColorMap {
+    	BLACK, WHITE;
+    }
     
     public enum Heading {
 	    // ordering is important. Must be clockwise for turn calculations
@@ -28,11 +29,11 @@ public class Grid {
      * Constructor that accepts a preallocated mapping of coordinates
      */ 
     public Grid(byte[][] m) {
-        map = new ArrayList<ArrayList<Byte>>(m.length);
+        map = new ArrayList<ArrayList<ColorMap>>(m.length);
         for (byte[] byteRow : m) {
-            var alRow = new ArrayList<Byte>(byteRow.length);
+            var alRow = new ArrayList<ColorMap>(byteRow.length);
             for (Byte b : byteRow) {
-                alRow.add(b);
+                alRow.add(ByteToColorMap(b));
             }
             map.add(alRow);
         }
@@ -51,13 +52,14 @@ public class Grid {
             var row = this.map.get(r);
             out.append("| ");
             for (int x=0; x<row.size(); x++) {
-            	byte b = row.get(x);
+            	var b = row.get(x);
             	var adjX = x+minX;
             	var adjY = r+minY;
             	if(adjY == loc.Y && adjX == loc.X) {
             		out.append(HeadingAsChar(loc.Heading));
             	} else {
-            		out.append(ByteToColor(b));
+            		char c = (b == ColorMap.BLACK ? 'B' : 'W');
+            		out.append(c);
             	}
                 out.append(' ');
             }
@@ -72,14 +74,14 @@ public class Grid {
     /*
      * Returns the value at the specified coordinate
      */ 
-    public byte Get(int x, int y) {
+    public ColorMap Get(int x, int y) {
         return this.map.get(y-minY).get(x-minX);
     }
     
     /*
      * Sets the value at the specified coordinate
      */
-    public void Set(int x, int y, byte value) {
+    public void Set(int x, int y, ColorMap value) {
         this.map.get(y-minY).set(x-minX, value);
     }
     
@@ -107,7 +109,7 @@ public class Grid {
         case WEST: 
             // insert a new first entry for each row
         	for(int y=0; y<this.Height(); y++) {
-            	this.map.get(y).add(0, BLACK);
+            	this.map.get(y).add(0, ColorMap.BLACK);
             }
             // decrement offset for values < 0
             minX--;
@@ -115,7 +117,7 @@ public class Grid {
         case EAST:
             // insert a new last entry for each row
             for(int y=0; y<this.Height(); y++) {
-            	this.map.get(y).add(BLACK);
+            	this.map.get(y).add(ColorMap.BLACK);
             }
             break;
         }
@@ -128,9 +130,9 @@ public class Grid {
      * Returns the new Height of the grid.
      */
     public int AddRow(Heading where) {
-        var newRow = new ArrayList<Byte>(this.Width()+1);
+        var newRow = new ArrayList<ColorMap>(this.Width()+1);
         for(int x=0; x<this.Width(); x++) {
-            newRow.add(BLACK);
+            newRow.add(ColorMap.BLACK);
         }
         switch (where) {
         case NORTH: 
@@ -179,14 +181,21 @@ public class Grid {
     		break;
     	}
     	// Turn the Ant based on the current grid color and rules
-    	n.Heading = this.Get(n.X, n.Y) == 0 ?
+    	n.Heading = this.Get(n.X, n.Y) == ColorMap.BLACK ?
     			Turn(n.Heading, Direction.LEFT) : 
     			Turn(n.Heading, Direction.RIGHT);
     	// Update the grid per rules
-    	this.Set(n.X, n.Y, this.Get(n.X, n.Y) == 0 ? (byte)1 : (byte)0);
+    	this.Set(n.X, n.Y, FlipColor(this.Get(n.X, n.Y)));
     	return n;
     }
    
+    /*
+     * Returns the opposite color of the input color
+     */
+    protected static ColorMap FlipColor(ColorMap in) {
+    	return in == ColorMap.BLACK ? ColorMap.WHITE : ColorMap.BLACK;
+    }
+    
     /*
      * Helper function to generate a right sized horizontal dashed line
      */
@@ -201,18 +210,18 @@ public class Grid {
     
     /*
      * Map byte values to either black (even) or white (odd)
-     * Returns B for black, W for white
      */ 
-    protected static char ByteToColor(byte b) {
-        switch (b % 2) {
-        case BLACK:
-            return 'B';
-        case WHITE:
-            return 'W';
-        default:
-            // dumb compiler
-            return 0;
+    protected static ColorMap ByteToColorMap(byte b) {
+        ColorMap result = null;
+    	switch (b % 2) {
+        case 0:
+            result = ColorMap.BLACK;
+            break;
+        case 1:
+            result = ColorMap.WHITE;
+            break;
         }
+    	return result;
     }
 
     /*
