@@ -3,12 +3,10 @@ package LangtonsAnt;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-
-import LangtonsAnt.Grid.Heading;
-
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+
+import LangtonsAnt.Grid.Heading;
 
 public class GridTest {
 
@@ -33,10 +31,10 @@ public class GridTest {
 			byte[][] b = { {0, 1}, {1, 0} };
 			Grid result = new Grid(b);
 			// validate that Get works on the preset value of 0
-			assertEquals(0, result.Get(0, 0), "Initial value");
+			assertEquals(Grid.ColorMap.BLACK, result.Get(0, 0), "Initial value");
 			// check that it can be set to 1 and fetched
-			result.Set(0,  0, (byte) 1 );
-			assertEquals(1, result.Get(0, 0), "After Set");
+			result.Set(0,  0, Grid.ColorMap.WHITE );
+			assertEquals(Grid.ColorMap.WHITE, result.Get(0, 0), "After Set");
 		}
 
 		@Test
@@ -69,7 +67,7 @@ public class GridTest {
 			assertEquals(oldWidth+1, newWidth, "Expected width to expand by 1");
 			// validate the first entry of each row, now x=-1 is the default new value (0)
 			for(int y=0; y < result.Height(); y++) {
-				assertEquals(Grid.BLACK, result.Get(-1, y), "Each row should have 0 as the first value");
+				assertEquals(Grid.ColorMap.BLACK, result.Get(-1, y), "Each row should have 0 as the first value");
 			}
 		}
 		
@@ -79,7 +77,7 @@ public class GridTest {
 			assertEquals(oldWidth+1, newWidth, "Expected width to expand by 1");
 			// validate the first entry of each row is the default new value (0)
 			for(int y=0; y < result.Height(); y++) {
-				assertEquals(Grid.BLACK, result.Get(newWidth-1, y), "Each row should have 0 as the first value");
+				assertEquals(Grid.ColorMap.BLACK, result.Get(newWidth-1, y), "Each row should have 0 as the first value");
 			}
 		}
 		
@@ -89,7 +87,7 @@ public class GridTest {
 			assertEquals(oldHeight+1, newHeight, "Expected height to expand by 1");
 			// validate all entries of the added row is the default new value (0)
 			for(int x=0; x < result.Width(); x++) {
-				assertEquals(Grid.BLACK, result.Get(x, newHeight-1), "Each col in the row should have 0 as the value");
+				assertEquals(Grid.ColorMap.BLACK, result.Get(x, newHeight-1), "Each col in the row should have 0 as the value");
 			}
 		}
 		
@@ -99,7 +97,7 @@ public class GridTest {
 			assertEquals(oldHeight+1, newHeight, "Expected height to expand by 1");
 			// validate all entries of the added row, now y=-1, is the default new value (0)
 			for(int x=0; x < result.Width(); x++) {
-				assertEquals(Grid.BLACK, result.Get(x, -1), "Each col in the row should have 0 as the value");
+				assertEquals(Grid.ColorMap.BLACK, result.Get(x, -1), "Each col in the row should have 0 as the value");
 			}
 		}
 	}
@@ -158,7 +156,7 @@ public class GridTest {
 				// get the destination grid color before
 				var colorBefore = target.Get(newX, newY );
 				// precalc the expected change (toggle black<->white)
-				var colorAfter = (colorBefore+1)%2;
+				var colorAfter = Grid.FlipColor(colorBefore);
 				// override the default heading in global setup
 				antBefore.Heading = inDir;
 				
@@ -226,9 +224,9 @@ public class GridTest {
 				var newX = antBefore.X+deltaX;
 				var newY = antBefore.Y+deltaY;
 				// all newly created points start as black (0)
-				var colorBefore = (byte)0;
+				var colorBefore = Grid.ColorMap.BLACK;
 				// precalc the expected change (toggle black<->white)
-				var colorAfter = (colorBefore+1)%2;
+				var colorAfter = Grid.FlipColor(colorBefore);
 				// override the default heading in global setup
 				antBefore.Heading = inDir;
 				
