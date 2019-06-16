@@ -47,6 +47,21 @@ public class GridTest {
     }
     
 	@Nested
+	class ToJsonTest {
+
+		Grid target;
+
+		@Test
+		void testPositive() {
+			target = new Grid(testInBytes);
+			var mapStr = "`map`:[[`B`,`W`,`B`],[`B`,`B`,`W`],[`W`,`B`,`B`],[`W`,`W`,`W`]]}";
+			var expected = ("{`minx`:0,`maxx`:2,`miny`:0,`maxy`:3,`numants`:1," + mapStr).replace('`','"');
+			String result = target.ToJson();
+			assertEquals(expected, result);
+		}
+	}
+
+	@Nested
 	class ExpandGridTest {
 
 		Grid result;

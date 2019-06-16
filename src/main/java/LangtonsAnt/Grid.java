@@ -8,9 +8,11 @@ import java.util.ArrayList;
  */ 
 public class Grid {
     ArrayList<ArrayList<ColorMap>> map;
-   // Need to track the far left and bottom indices for coordinates that can go < 0 
+   // Need to track the edge indices given that coordinates are dynamic and won't remain 0 based
     int minX = 0;
+    int maxX = 0;
     int minY = 0;
+    int maxY = 0;
 
     public enum ColorMap {
     	BLACK, WHITE;
@@ -27,8 +29,10 @@ public class Grid {
 
     /*
      * Constructor that accepts a preallocated mapping of coordinates
+     * Will construct a 0 based grid with X and Y coords increasing per additional row/col
      */ 
     public Grid(byte[][] m) {
+    	//TODO: throw on m not being at least 1x1
         map = new ArrayList<ArrayList<ColorMap>>(m.length);
         for (byte[] byteRow : m) {
             var alRow = new ArrayList<ColorMap>(byteRow.length);
@@ -37,6 +41,8 @@ public class Grid {
             }
             map.add(alRow);
         }
+        maxX = m[0].length - 1;
+        maxY = m.length - 1;
     }
     
     /*
@@ -72,6 +78,32 @@ public class Grid {
     }
     
     /*
+     * Generates a json representation of the grid, including location of all ants.
+     * ---Takes an Ant as input to generate a marking for it's location and heading.
+     */
+    public String ToJson() {
+    	var map = this.toCharMap();
+        var json = new JsonGrid(this.minX, this.maxX, this.minY, this.maxY, 1 /* hard code a single ant for now */, map);
+        return json.toJson();
+    }
+
+	/**
+	 * @return A simplified char representation of the Grid
+	 */
+	protected char[][] toCharMap() {
+   		var result = new char[this.Height()][this.Width()];
+  	    for (int r= 0; r < this.Height(); r++) {
+  	    	var row = this.map.get(r);
+            for (int x=0; x<row.size(); x++) {
+            	var b = row.get(x);
+        		char c = (b == ColorMap.BLACK ? 'B' : 'W');
+ 	            result[r][x] = c;
+	        }
+  	    }
+  	    return result;
+	}
+ 
+    	/*
      * Returns the value at the specified coordinate
      */ 
     public ColorMap Get(int x, int y) {
@@ -100,8 +132,8 @@ public class Grid {
     }
     
     /*
-     * Adds a 0 filled column to either the 'west' or 'east' of the grid, maintaining 0,0 as the origin
-     * If inserted left, the new col becomes y=0, and all existing cols shift right by 1
+     * Adds a 0 filled column to either the 'west' or 'east' of the grid.
+     * If inserted left (south), the cols are shifted for insertion and minX is decremented to track offset.
      * Returns the new Width of the grid.
      */
     public int AddCol(Heading where) {
@@ -119,14 +151,15 @@ public class Grid {
             for(int y=0; y<this.Height(); y++) {
             	this.map.get(y).add(ColorMap.BLACK);
             }
+            maxX++;
             break;
         }
         return this.Width();
     }
 
     /*
-     * Adds a 0 filled row to either the 'north' or 'south' of the grid, maintaining 0,0 as the origin
-     * If inserted below, the new row becomes x=0, and all existing rows shift up by 1
+     * Adds a 0 filled row to either the 'north' or 'south' of the grid.
+     * If inserted below (south), the rows are shifted for insertion and minY is decremented to track the offset.
      * Returns the new Height of the grid.
      */
     public int AddRow(Heading where) {
@@ -137,6 +170,7 @@ public class Grid {
         switch (where) {
         case NORTH: 
             this.map.add(this.Height(), newRow);
+            maxY++;
             break;
         case SOUTH:
             this.map.add(0, newRow);
