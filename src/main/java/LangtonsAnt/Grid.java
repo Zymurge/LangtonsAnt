@@ -153,6 +153,9 @@ public class Grid {
             }
             maxX++;
             break;
+        case NORTH:
+        case SOUTH:
+        	throw new IllegalArgumentException("AddCol can only accept WEST or EAST headings");
         }
         return this.Width();
     }
@@ -177,6 +180,9 @@ public class Grid {
             // decrement offset for values < 0
             minY--;
             break;
+        case WEST:
+        case EAST:
+        	throw new IllegalArgumentException("AddRow can only accept NORTH or SOUTH headings");
         }
         return this.Height();
     }

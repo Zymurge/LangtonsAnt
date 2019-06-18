@@ -33,6 +33,10 @@ public class JsonGrid {
 		this.maxy = maxy;
 		this.numants = numants;
 		this.map = map;
+		
+		if( this.map == null ) {
+			throw new NullPointerException("map parameter must be at least 1x1");
+		}
 	}
 	
 	public String toJson() {

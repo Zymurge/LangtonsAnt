@@ -20,7 +20,17 @@ class JsonGridTest {
 		var target = new JsonGrid(0, 3, -1, 2, 1, map);
 		var result = target.toJson();
 		assertEquals(expected, result);
-		
+	}
+	
+	@Test
+	void testNullMap() {
+		//TODO: figure out how to pass in the expected exception type
+		assertThrows(NullPointerException.class, () -> new JsonGrid(0, 2, -1, 1, 1, null));
+//		var expected = "{`minx`:0,`maxx`:2,`miny`:-1,`maxy`:1,`numants`:1,`map`:".replace('`','"');
+//		var target = new JsonGrid(0, 2, -1, 1, 1, null);
+//		assertNotNull(target, "I think this should fail");
+//		var result = target.toJson();
+//		assertEquals(expected, result);
 	}
 
 }

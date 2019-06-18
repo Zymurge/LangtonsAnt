@@ -97,6 +97,12 @@ public class GridTest {
 		}
 		
 		@Test
+		void testAddColIllegalHeading() {
+			assertThrows(IllegalArgumentException.class, ()-> result.AddCol(Grid.Heading.NORTH));
+			assertThrows(IllegalArgumentException.class, ()-> result.AddCol(Grid.Heading.SOUTH));
+		}
+		
+		@Test
 		void testAddRowTop() {
 			var newHeight = result.AddRow(Grid.Heading.NORTH);
 			assertEquals(oldHeight+1, newHeight, "Expected height to expand by 1");
@@ -114,6 +120,12 @@ public class GridTest {
 			for(int x=0; x < result.Width(); x++) {
 				assertEquals(Grid.ColorMap.BLACK, result.Get(x, -1), "Each col in the row should have 0 as the value");
 			}
+		}
+	
+		@Test
+		void testAddRowIllegalHeading() {
+			assertThrows(IllegalArgumentException.class, ()-> result.AddRow(Grid.Heading.WEST));
+			assertThrows(IllegalArgumentException.class, ()-> result.AddRow(Grid.Heading.EAST));
 		}
 	}
 
