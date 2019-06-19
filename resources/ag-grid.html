@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/dist/styles/ag-grid.css">
+    <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/dist/styles/ag-theme-balham.css"
+</head>
+<body>
+<h1>Hello from ag-grid!</h1>
+<div id="myGrid" style="height: 500px; width:300px;" class="ag-theme-balham"></div>
+
+<script type="text/javascript" charset="utf-8">
+    const columnDefs = [
+        {headerName: '  ',  field: 'row', cellStyle: { color: 'red', backgroundColor: '#F5F7F7' } },
+        {headerName: '-2',  field: '0' },
+        {headerName: '-1',  field: '1' },
+        {headerName:  '0',  field: '2' },
+        {headerName:  '1',  field: '3' },
+        {headerName:  '2',  field: '4' },
+    ];
+
+    const defaultColDef = {
+        width: 40,
+        cellStyle: function(params) {
+	        if (params.value=='B') {
+	            //mark police cells as red
+	            return {color: 'white', backgroundColor: 'black'};
+	        } else {
+	            return {color: 'black', backgroundColor: 'white'};
+	        }
+		},
+    };
+
+    const rowData = [
+        {row: '-1', 0: 'W', 1: 'B', 2: 'B', 3: 'B', 4: 'B'},
+        {row: ' 0', 0: 'B', 1: 'B', 2: 'B', 3: 'W', 4: 'W'},
+        {row: ' 1', 0: 'W', 1: 'W', 2: 'B', 3: 'B', 4: 'W'},
+        {row: ' 2', 0: 'W', 1: 'W', 2: 'V', 3: 'B', 4: 'W'},
+        {row: ' 3', 0: 'B', 1: 'B', 2: 'B', 3: 'B', 4: 'B'},
+        {row: ' 4', 0: 'B', 1: 'W', 2: 'B', 3: 'W', 4: 'B'},
+    ];
+
+    const gridOptions = {
+        columnDefs: columnDefs,
+	    defaultColDef: defaultColDef,
+		rowHeight: defaultColDef.width,
+        rowData: rowData
+    };
+
+    const eGridDiv = document.querySelector('#myGrid');
+    new agGrid.Grid(eGridDiv, gridOptions);
+</script>
+</body>
+</html>
