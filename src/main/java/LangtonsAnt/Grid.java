@@ -2,9 +2,10 @@ package LangtonsAnt;
 
 import java.util.ArrayList;
 
-/*
+/**
  * Represents the two dimensional map and status of the coordinates
- * Uses a standard X,Y coord system, with 0,0 in the lower left.
+ * Uses a standard X,Y coord system, with 0,0 in the lower left
+ * @author mark
  */ 
 public class Grid {
     ArrayList<ArrayList<ColorMap>> map;
@@ -14,35 +15,53 @@ public class Grid {
     int minY = 0;
     int maxY = 0;
 
+    /**
+     * Constant values for Grid coordinates
+     */
     public enum ColorMap {
     	BLACK, WHITE;
     }
     
-    public enum Heading {
+    /**
+     * Constant values for Grid directions. Uses compass coordinates where NORTH is up, WEST is left, etc.
+     */
+   public enum Heading {
 	    // ordering is important. Must be clockwise for turn calculations
     	NORTH, EAST, SOUTH, WEST;
     }
     
-    public enum Direction {
+   /**
+    * Constant values for direction changes, where LEFT is a clockwise turn and RIGHT is counter
+    */
+   public enum Direction {
     	LEFT, RIGHT;
     }
 
-    /*
+    /**
      * Constructor that accepts a preallocated mapping of coordinates
      * Will construct a 0 based grid with X and Y coords increasing per additional row/col
+     * @param mapValues A two dimensional array of [y] rows or [x] grid elements. Even values will be interpreted as white, 
+     * while odd will be mapped as black. 
+     * @throws IllegalArgumentException if mapValues are either empty or have inconsistent row lengths
      */ 
-    public Grid(byte[][] m) {
-    	//TODO: throw on m not being at least 1x1
-        map = new ArrayList<ArrayList<ColorMap>>(m.length);
-        for (byte[] byteRow : m) {
+    public Grid(byte[][] mapValues) {
+    	if(mapValues == null || mapValues.length < 1 || mapValues[0].length < 1) { 
+    		throw new IllegalArgumentException("cannot instantiate Grid with null or empty mapValues");
+    	}
+        var firstRowLength = mapValues[0].length;
+        map = new ArrayList<ArrayList<ColorMap>>(mapValues.length);
+        for (byte[] byteRow : mapValues) {
+        	if(byteRow.length != firstRowLength) { 
+        		throw new IllegalArgumentException("all mapValues rows must be the same length");
+        	}
             var alRow = new ArrayList<ColorMap>(byteRow.length);
             for (Byte b : byteRow) {
                 alRow.add(ByteToColorMap(b));
             }
             map.add(alRow);
         }
-        maxX = m[0].length - 1;
-        maxY = m.length - 1;
+        maxX = mapValues[0].length - 1;
+        maxY = mapValues.length - 1;
     }
     
     /*

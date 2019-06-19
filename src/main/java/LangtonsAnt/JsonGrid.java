@@ -17,7 +17,10 @@ import com.google.gson.Gson;
 				[ "B", "B", "B", "B", "B" ]
 			]
  */
-
+/**
+ * Utility class used to create a custom JSON output for the LangstonsAnt Grid state
+ * @author mark
+ */
 public class JsonGrid {
 	int minx;
 	int maxx;
@@ -26,6 +29,14 @@ public class JsonGrid {
 	int numants;
 	char[][] map;
 	
+	/**
+	 * Constructs a JsonGrid instance
+	 * @param minx The lower boundary of the X axis
+	 * @param maxx The upper boundary of the X axis
+	 * @param miny The lower boundary of the Y axis
+	 * @param maxx The upper boundary of the Y axis
+	 * @throws NullPointerException if map isn't populated with at least 1 column with 1 row
+	 */
 	public JsonGrid(int minx, int maxx, int miny, int maxy, int numants, char[][] map) {
 		this.minx = minx;
 		this.maxx = maxx;
@@ -39,6 +50,10 @@ public class JsonGrid {
 		}
 	}
 	
+	/**
+	 * Generates the JSON output
+	 * @return A JSON string
+	 */
 	public String toJson() {
 		Gson gson = new Gson();
 		return gson.toJson(this);

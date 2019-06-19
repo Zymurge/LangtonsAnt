@@ -27,6 +27,29 @@ public class GridTest {
 		}
 		
 		@Test
+		void testCtorThrowsOnNullMap() {
+			var msg = assertThrows(IllegalArgumentException.class, () -> new Grid(null));
+			assertTrue(msg.getMessage().contains("null or empty mapValues"));
+		}
+
+		@Test
+		void testCtorThrowsOnEmptyMap() {
+			byte[][] empty1 = { };
+			var msg = assertThrows(IllegalArgumentException.class, () -> new Grid(empty1));
+			assertTrue(msg.getMessage().contains("null or empty mapValues"));
+			byte[][] empty2 = { { } };
+			msg = assertThrows(IllegalArgumentException.class, () -> new Grid(empty2));
+			assertTrue(msg.getMessage().contains("null or empty mapValues"));
+		}
+		
+		@Test
+		void testCtorThrowsOnInconsistentMap() {
+			byte[][] unbalanced = { {  0, 1, 0 }, { 0, 0, 1 }, { 1, 0 }, { 1, 1, 1 } };
+			var msg = assertThrows(IllegalArgumentException.class, () -> new Grid(unbalanced));
+			assertTrue(msg.getMessage().contains("all mapValues rows must be the same length"));
+		}
+				
+		@Test
 		void testAccessors() {
 			byte[][] b = { {0, 1}, {1, 0} };
 			Grid result = new Grid(b);
