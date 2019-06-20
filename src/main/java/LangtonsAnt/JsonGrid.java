@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 				[ "B", "B", "B", "B", "B" ]
 			]
  */
+
 /**
  * Utility class used to create a custom JSON output for the LangstonsAnt Grid state
  * @author mark
@@ -55,7 +56,7 @@ public class JsonGrid {
 	
 		// update appropriate grid coordinates with ant locations
 		for(Ant a : this.ants) {
-			map[a.X][a.Y] = Grid.HeadingAsChar(a.Heading);
+			map[a.X][a.Y] = a.Heading.PrintValue();
 		}
 	}
 	

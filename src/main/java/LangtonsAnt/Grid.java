@@ -73,11 +73,12 @@ public class Grid {
         maxY = mapValues.length - 1;
     }
     
-    /*
-     * Generates a string representation of the grid with one row per line.
-     * Takes an Ant as input to generate a marking for it's location and heading.
+    /**
+     * Generates a string representation of the grid with one row per line and incorporates the Ant locations
+     * with heading markers
+     * @param ants an array of Ants to plot in the string
      */
-    public String Draw(Ant loc) {
+    public String Draw(Ant[] ants) {
         var out = new StringBuilder();
         out.append(DrawHorizontalLine(this.Width()));
         
@@ -89,19 +90,24 @@ public class Grid {
             	var b = row.get(x);
             	var adjX = x+minX;
             	var adjY = r+minY;
-            	if(adjY == loc.Y && adjX == loc.X) {
-            		out.append(HeadingAsChar(loc.Heading));
-            	} else {
-            		char c = (b == ColorMap.BLACK ? 'B' : 'W');
-            		out.append(c);
+            	// pre-allocate the color
+            	char c = (b == ColorMap.BLACK ? 'B' : 'W');
+            	// if an ant is found on this coord, replace the color with it's heading
+            	for(Ant a : ants) {
+            		if(adjY == a.Y && adjX == a.X) {
+            			c = a.Heading.PrintValue();
+            		}
             	}
+           		out.append(c);
                 out.append(' ');
             }
             out.append("|\n");
         }
     
         out.append(DrawHorizontalLine(this.Width()));
-        out.append("Ant at " + loc.ToString() + "\n");
+    	for(Ant a : ants) {
+    		out.append("Ant at " + a.ToString() + "\n");
+    	}
         return out.toString();
     }
     
@@ -293,14 +299,6 @@ public class Grid {
             break;
         }
     	return result;
-    }
-
-    /**
-     * @deprecated
-     * TODO: replace calls with direct enum method
-     */ 
-    protected static char HeadingAsChar(Grid.Heading h) {
-        return h.PrintValue();
     }
 
     /*

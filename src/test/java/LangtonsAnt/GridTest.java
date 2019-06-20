@@ -62,16 +62,20 @@ public class GridTest {
 
 		@Test
 		void testDrawReallyBasic() {
-	        var a = new Ant(1, 2, Grid.Heading.SOUTH);
+			Ant[] testAnts = {
+			   	    new Ant( 2, 0, Grid.Heading.WEST),
+				    new Ant( 1, 2, Grid.Heading.SOUTH)
+				};		
 			var expected = 
 					  " -------\n" 
 					+ "| W W W |\n"
 					+ "| W " + Grid.Heading.SOUTH.PrintValue() + " B |\n"
 					+ "| B B W |\n"
-					+ "| B W B |\n"
+					+ "| B W " + Grid.Heading.WEST.PrintValue() + " |\n"
 					+ " -------\n"
+					+ "Ant at (2,0) WEST\n"
 					+ "Ant at (1,2) SOUTH\n";
-			var result = target.Draw(a);
+			var result = target.Draw(testAnts);
 			assertEquals(result,expected);
 		}
 		
