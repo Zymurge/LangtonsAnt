@@ -63,8 +63,16 @@ public class GridTest {
 		@Test
 		void testDrawReallyBasic() {
 	        var a = new Ant(1, 2, Grid.Heading.SOUTH);
+			var expected = 
+					  " -------\n" 
+					+ "| W W W |\n"
+					+ "| W " + Grid.Heading.SOUTH.PrintValue() + " B |\n"
+					+ "| B B W |\n"
+					+ "| B W B |\n"
+					+ " -------\n"
+					+ "Ant at (1,2) SOUTH\n";
 			var result = target.Draw(a);
-			assertEquals(result," -------\n| W W W |\n| W v B |\n| B B W |\n| B W B |\n -------\nAnt at (1,2) SOUTH\n");
+			assertEquals(result,expected);
 		}
 		
     }
@@ -72,14 +80,23 @@ public class GridTest {
 	@Nested
 	class ToJsonTest {
 
+		Ant[] testAnts = {
+		   	    new Ant( 1, 1, Grid.Heading.WEST),
+			    new Ant( 2, 0, Grid.Heading.SOUTH)
+			};		
 		Grid target;
 
 		@Test
 		void testPositive() {
 			target = new Grid(testInBytes);
-			var mapStr = "`map`:[[`B`,`W`,`B`],[`B`,`B`,`W`],[`W`,`B`,`B`],[`W`,`W`,`W`]]}";
-			var expected = ("{`minx`:0,`maxx`:2,`miny`:0,`maxy`:3,`numants`:1," + mapStr).replace('`','"');
-			String result = target.ToJson();
+			var expected = (
+					"{`minx`:0,`maxx`:2,`miny`:0,`maxy`:3,`numants`:2,`map`:[[`B`,`W`,`B`],[`B`,`"
+					+ Grid.Heading.WEST.PrintValue() 
+					+ "`,`W`],[`" 
+					+ Grid.Heading.SOUTH.PrintValue() 
+					+ "`,`B`,`B`],[`W`,`W`,`W`]]}"
+				).replace('`','"');
+			String result = target.ToJson(testAnts);
 			assertEquals(expected, result);
 		}
 	}

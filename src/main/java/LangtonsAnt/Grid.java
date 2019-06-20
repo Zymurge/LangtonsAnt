@@ -27,7 +27,16 @@ public class Grid {
      */
    public enum Heading {
 	    // ordering is important. Must be clockwise for turn calculations
-    	NORTH, EAST, SOUTH, WEST;
+    	NORTH('\u21E7'), EAST('\u21E8'), SOUTH('\u21E9'), WEST('\u21E6');
+	    private char printValue;
+	    
+	    private Heading(char p) {
+	    	this.printValue = p;
+	    }
+	    
+	    public char PrintValue() {
+	    	return this.printValue;
+	    }
     }
     
    /**
@@ -96,14 +105,17 @@ public class Grid {
         return out.toString();
     }
     
-    /*
-     * Generates a json representation of the grid, including location of all ants.
-     * ---Takes an Ant as input to generate a marking for it's location and heading.
+    /**
+     * @ants Array of ants to plot inside the JSON output
+     * @returns a JSON representation of the grid, including location of all ants 
      */
-    public String ToJson() {
-    	var map = this.toCharMap();
-        var json = new JsonGrid(this.minX, this.maxX, this.minY, this.maxY, 1 /* hard code a single ant for now */, map);
-        return json.toJson();
+    public String ToJson(Ant[] ants) {
+        return new JsonGrid(
+        		this.minX, this.maxX, this.minY, this.maxY, 
+        		ants, 
+        		this.toCharMap()
+    		)
+    		.toJson();
     }
 
 	/**
@@ -283,24 +295,12 @@ public class Grid {
     	return result;
     }
 
-    /*
-     * Map byte values to either black (even) or white (odd)
-     * Returns B for black, W for white
+    /**
+     * @deprecated
+     * TODO: replace calls with direct enum method
      */ 
     protected static char HeadingAsChar(Grid.Heading h) {
-        switch (h) {
-        case NORTH:
-            return '^';
-        case EAST:
-            return '>';
-        case SOUTH:
-            return 'v';
-        case WEST:
-            return '<';
-        default:
-            // dumb compiler
-            return 0;
-        }
+        return h.PrintValue();
     }
 
     /*
